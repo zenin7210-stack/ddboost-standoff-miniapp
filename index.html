@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>DD BOOST | STANDOFF 2</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090d14;color:#f3f5fa;font:16px -apple-system,BlinkMacSystemFont,Arial,sans-serif}
+main{max-width:520px;margin:auto;padding:22px 18px 35px}
+header{padding:24px 20px;border:1px solid #253247;border-radius:22px;background:linear-gradient(145deg,#17243a,#0d121c)}
+.logo{font-size:13px;letter-spacing:2px;color:#83b7ff;font-weight:800}
+h1{font-size:27px;margin:10px 0 5px}
+.sub{color:#9ba8ba;font-size:14px}
+h2{font-size:17px;margin:24px 0 11px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button,select,input{font:inherit}
+.mode{padding:13px 5px;border:1px solid #293548;border-radius:12px;background:#111925;color:#cbd4e2}
+.mode.active{border-color:#5597ff;background:#172b49;color:white}
+label{display:block;color:#9ba8ba;font-size:13px;margin:15px 0 7px}
+select,input{width:100%;padding:14px;border:1px solid #293548;border-radius:12px;background:#111925;color:white;outline:none}
+.card{margin-top:22px;padding:18px;border:1px solid #293548;border-radius:16px;background:#101722}
+.row{display:flex;justify-content:space-between;align-items:center;color:#aab5c5}
+.total{font-size:30px;font-weight:800;color:white;margin-top:8px}
+.note{font-size:12px;color:#8793a5;margin-top:7px;line-height:1.45}
+.order{width:100%;margin-top:16px;padding:16px;border:0;border-radius:13px;background:#3888ff;color:white;font-weight:750}
+.order:disabled{opacity:.45}
+footer{text-align:center;color:#697689;font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="logo">DD BOOST</div>
+  <h1>STANDOFF 2</h1>
+  <div class="sub">Подбор буста по вашему рангу</div>
+</header>
+
+<h2>Выбери режим</h2>
+<div class="modes">
+  <button class="mode active" data-mode="ММ">ММ</button>
+  <button class="mode" data-mode="Соревновательный">Соревновательный</button>
+  <button class="mode" data-mode="Дуэли">Дуэли</button>
+</div>
+
+<label for="current">Текущий ранг</label>
+<select id="current"></select>
+
+<label for="target">Желаемый ранг</label>
+<select id="target"></select>
+
+<label for="player">Твой игровой ID или ник</label>
+<input id="player" placeholder="Например: 12345678 или Player">
+
+<section class="card">
+  <div class="row"><span>Стоимость буста</span><span id="steps">Выбери ранги</span></div>
+  <div class="total" id="price">0 сум</div>
+  <div class="note">Цена считается автоматически за каждый ранг. Перед оплатой детали заказа подтвердит администратор.</div>
+  <button class="order" id="order" disabled>Оформить заказ</button>
+</section>
+<footer>DD BOOST · STANDOFF 2</footer>
+</main>
+
+<script>
+const ranks=["Калибровка","Бронза","Серебро","Золото","Феникс","Рейнджер","Чемпион","Мастер","Элита","Легенда"];
+// Цена перехода на следующий ранг, сум:
+const prices=[3000,3000,4000,6000,9000,13000,18000,25000,35000];
+
+const current=document.querySelector("#current");
+const target=document.querySelector("#target");
+const price=document.querySelector("#price");
+const steps=document.querySelector("#steps");
+const order=document.querySelector("#order");
+let mode="ММ";
+
+function fill(select){
+  ranks.forEach((rank,i)=>{
+    const option=document.createElement("option");
+    option.value=i; option.textContent=rank;
+    select.appendChild(option);
+  });
+}
+fill(current); fill(target);
+current.value="0"; target.value="1";
+
+function update(){
+  const from=Number(current.value), to=Number(target.value);
+  let sum=0;
+  if(to>from) for(let i=from;i<to;i++) sum+=prices[i];
+  price.textContent=sum.toLocaleString("ru-RU")+" сум";
+  steps.textContent=to>from ? (to-from)+" ранга" : "Выбери ранг выше";
+  order.disabled=to<=from || !document.querySelector("#player").value.trim();
+}
+document.querySelectorAll(".mode").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
+    button.classList.add("active");
+    mode=button.dataset.mode;
+  });
+});
+[current,target].forEach(x=>x.addEventListener("change",update));
+document.querySelector("#player").addEventListener("input",update);
+
+order.addEventListener("click",()=>{
+  const from=Number(current.value), to=Number(target.value);
+  const player=document.querySelector("#player").value.trim();
+  const message=`Здравствуйте! Хочу заказать буст DD BOOST\nРежим: ${mode}\nИгровой ID/ник: ${player}\nРанг: ${ranks[from]} → ${ranks[to]}\nЦена: ${price.textContent}`;
+  const link="https://t.me/ddcontrol?text="+encodeURIComponent(message);
+  if(window.Telegram?.WebApp) Telegram.WebApp.openTelegramLink(link);
+  else window.location.href=link;
+});
+if(window.Telegram?.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}
+update();
+</script>
+</body>
+</html>
