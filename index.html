@@ -1,301 +1,93 @@
 <!doctype html>
 <html lang="uz">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#030812">
-<title>Arslan Boost | Standoff 2</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{box-sizing:border-box}
-:root{color-scheme:dark}
-body{
-  --accent:#16aaff;--accent-soft:#0c2541;--glow:rgba(22,170,255,.2);
-  margin:0;background:#030812;color:#f3f7ff;
-  font:16px -apple-system,BlinkMacSystemFont,Arial,sans-serif;
-  transition:--accent .16s ease;
-}
-body[data-mode="Сорев"]{--accent:#a66bff;--accent-soft:#271844;--glow:rgba(166,107,255,.2)}
-body[data-mode="Дуэль"]{--accent:#18d4c0;--accent-soft:#10322f;--glow:rgba(24,212,192,.2)}
-main{max-width:560px;margin:auto;padding:18px 16px 30px}
-.hero{
-  position:relative;overflow:hidden;min-height:190px;padding:22px 18px;
-  display:flex;align-items:center;gap:16px;
-  border:1px solid #17466d;border-radius:22px;
-  background:
-    linear-gradient(145deg,rgba(12,29,52,.95),rgba(4,9,18,.98));
-  box-shadow:0 0 30px var(--glow);
-  transition:border-color .16s,box-shadow .16s;
-}
-.hero:before,.hero:after{
-  content:"";position:absolute;width:190px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);
-  box-shadow:0 0 12px var(--accent);transform:rotate(-38deg);pointer-events:none
-}
-.hero:before{left:-70px;top:25px}
-.hero:after{right:-80px;bottom:28px}
-.hero-logo{width:112px;min-width:92px;filter:drop-shadow(0 0 10px var(--accent))}
-.brand{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:3px}
-.hero h1{font-size:27px;line-height:1;margin:10px 0 6px;letter-spacing:1px}
-.boost-word{font-weight:900;letter-spacing:5px;color:#27ddff}
-.tagline{font-size:13px;color:#a9bad0;line-height:1.45}
-h2{font-size:18px;margin:24px 0 11px}
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-button,input{font:inherit}
-.mode{
-  min-height:50px;padding:9px 3px;border:1px solid #263850;
-  border-radius:13px;background:#0c1421;color:#cbd7e8;
-  transition:background .16s,border-color .16s,color .16s,box-shadow .16s,transform .16s
-}
-.mode:active{transform:scale(.98)}
-.mode.active{
-  color:#fff;border-color:var(--accent);background:var(--accent-soft);
-  box-shadow:0 0 14px var(--glow);animation:tap .17s ease-out
-}
-@keyframes tap{from{transform:scale(.975);filter:brightness(1.2)}to{transform:scale(1);filter:brightness(1)}}
-.selected-mode{font-size:13px;color:var(--accent);margin-top:9px}
-label{display:block;color:#aab9ce;font-size:14px;margin:16px 0 7px}
-.rank-select{
-  width:100%;min-height:60px;display:flex;align-items:center;gap:12px;
-  padding:8px 13px;border:1px solid #293a52;border-radius:14px;
-  background:#0c1421;color:#fff;text-align:left
-}
-.rank-select:focus{outline:1px solid var(--accent)}
-.rank-icon{width:42px;height:46px;flex:none}
-.rank-name{flex:1;font-size:17px}
-.chevron{color:#9bacc1;font-size:18px}
-.player{
-  width:100%;padding:15px;border:1px solid #293a52;border-radius:13px;
-  background:#0c1421;color:white;outline:none
-}
-.player:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-.player::placeholder{color:#7e8ca0}
-.card{
-  margin-top:20px;padding:18px;border:1px solid #1b3d5b;border-radius:17px;
-  background:linear-gradient(145deg,#0d1928,#080e18);
-  box-shadow:0 0 24px var(--glow);transition:box-shadow .16s,border-color .16s
-}
-.row{display:flex;justify-content:space-between;gap:8px;color:#aab9ce}
-#steps{text-align:right}
-.total{font-size:32px;font-weight:850;margin-top:9px}
-.breakdown{color:var(--accent);font-size:13px;line-height:1.5;margin-top:5px}
-.note{font-size:13px;color:#91a1b6;line-height:1.5;margin-top:10px}
-.order{
-  width:100%;margin-top:16px;padding:16px;border:1px solid var(--accent);
-  border-radius:13px;background:linear-gradient(100deg,#086fc4,var(--accent));
-  color:white;font-weight:750;box-shadow:0 4px 20px var(--glow);
-  transition:transform .15s,filter .15s
-}
-.order:active{transform:scale(.99);filter:brightness(1.12)}
-.order:disabled{opacity:.4;box-shadow:none}
-footer{text-align:center;color:#72839a;font-size:11px;letter-spacing:2px;margin-top:19px}
-
-/* Rank tanlash oynasi */
-.picker[hidden]{display:none}
-.picker{
-  position:fixed;inset:0;z-index:5;display:flex;align-items:flex-end;
-  justify-content:center;padding:14px;background:rgba(0,0,0,.72);
-  backdrop-filter:blur(7px)
-}
-.picker-box{
-  width:min(100%,540px);max-height:78vh;overflow:auto;
-  padding:16px;border:1px solid #244361;border-radius:20px 20px 14px 14px;
-  background:#0a111d;box-shadow:0 0 28px var(--glow);
-  animation:rise .18s ease-out
-}
-@keyframes rise{from{transform:translateY(12px);opacity:.7}to{transform:translateY(0);opacity:1}}
-.picker-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.picker-head strong{letter-spacing:1px}
-.close-picker{border:0;background:none;color:#cbd7e8;font-size:25px}
-.rank-option{
-  width:100%;display:flex;align-items:center;gap:12px;text-align:left;
-  padding:8px 10px;margin:4px 0;border:1px solid transparent;border-radius:12px;
-  background:#0e1724;color:#f3f7ff
-}
-.rank-option:active{transform:scale(.99)}
-.rank-option.current-choice{border-color:var(--accent);background:var(--accent-soft)}
-@media(prefers-reduced-motion:reduce){
-  *,*:before,*:after{animation:none!important;transition:none!important}
-}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#06101e"><title>Arslan Boost</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#050d19;--panel:#08172a;--panel2:#0b1c31;--line:#183858;--cyan:#00d8ff;--blue:#087cff;--muted:#9db1cf;--white:#f5f8ff;--purple:#603cff;--safe:env(safe-area-inset-bottom,0px)}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 55% -15%,#0b3151 0,transparent 48%),linear-gradient(180deg,#040b15,#06111f 55%,#030a14);color:var(--white);font-family:Inter,system-ui,sans-serif;min-height:100vh}
+    button,input,select{font:inherit;color:inherit} button{cursor:pointer} .app{max-width:520px;margin:auto;padding:env(safe-area-inset-top,12px) 16px calc(100px + var(--safe));min-height:100vh;position:relative;overflow:hidden}
+    .tg-head{height:48px;display:flex;justify-content:center;align-items:center;color:#e9f1ff;font-size:13px;position:relative}.tg-head span{opacity:.65;font-size:11px;display:block;text-align:center;margin-top:2px}.tg-head strong{font-weight:600}.tg-icon{position:absolute;top:7px;border:1px solid #34516f;background:#0c192b99;border-radius:50%;height:32px;width:32px;display:grid;place-items:center;color:white;font-size:18px}.tg-icon.left{left:0}.tg-icon.right{right:0}
+    .page{display:none;animation:fade .25s ease}.page.active{display:block}@keyframes fade{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .hero{margin:10px 0 14px;height:178px;border:1px solid #057bad;border-radius:22px;background:#071a2d url('assets/hero-banner.jpg') center/cover no-repeat;box-shadow:0 0 18px #008cff26;overflow:hidden;position:relative}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#03101b15,transparent 65%);pointer-events:none}
+    .quick{display:grid;grid-template-columns:1.12fr 1fr 1fr;gap:8px;margin:0 0 17px}.quick button{min-height:59px;padding:8px 9px;border:1px solid #087cac;border-radius:14px;background:linear-gradient(145deg,#0b1d31e8,#061222);box-shadow:inset 0 0 14px #00aaff10;display:flex;align-items:center;gap:8px;text-align:left;font-size:11px}.quick .qicon{color:var(--cyan);font-size:21px;line-height:1}.quick strong{display:block;font-size:13px;margin-top:2px}.quick .plus{margin-left:auto;border-radius:50%;background:linear-gradient(135deg,#00dcff,#0873ff);width:29px;height:29px;text-align:center;line-height:29px;font-size:20px;font-weight:700;box-shadow:0 0 12px #00c7ff55}
+    h1{font-size:23px;margin:12px 2px 12px;letter-spacing:-.5px} h2{font-size:20px;margin:22px 2px 10px}.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mode{height:78px;border:1px solid;border-radius:15px;position:relative;overflow:hidden;background:#09192b center 39%/cover no-repeat;display:flex;align-items:end;justify-content:center;padding-bottom:13px;font-weight:600;text-shadow:0 2px 7px #000;isolation:isolate}.mode:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#020814e6,#08182d55 90%);z-index:-1}.mode.selected:after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 18px #00cfffaa;pointer-events:none}.mode[data-mode="wing"]{border-color:#00cfff;background-image:url('assets/napy.jpg')}.mode[data-mode="comp"]{border-color:#d42cff;background-image:url('assets/competitive.jpg')}.mode[data-mode="duel"]{border-color:#00d8c9;background-image:url('assets/duel.jpg')}.chosen{color:var(--cyan);font-size:13px;margin:9px 4px 17px}
+    .label{font-size:14px;color:#b9cae3;margin:16px 4px 7px}.field{width:100%;min-height:60px;border:1px solid #24466c;border-radius:16px;background:linear-gradient(110deg,#09182a,#071525);padding:10px 14px;display:flex;align-items:center;gap:13px;box-shadow:inset 0 0 14px #13345b20}.field select,.field input{background:transparent;border:0;outline:0;width:100%;font-size:15px;color:#f5f8ff}.field select option{background:#0b1930}.rank-mark{font-size:22px;color:#faad72;width:27px;text-align:center}
+    .price-card{margin-top:18px;padding:16px;border:1px solid #087ac2;border-radius:22px;background:radial-gradient(circle at 100% 100%,#063e66 0,transparent 27%),linear-gradient(145deg,#06172a,#071326);box-shadow:0 0 16px #008cff24;position:relative;overflow:hidden}.price-card:after{content:"";position:absolute;width:150px;height:2px;background:#00d8ff;right:-35px;bottom:31px;transform:rotate(-42deg);box-shadow:0 0 8px #00d8ff}.price-top{display:flex;align-items:center;justify-content:space-between;color:#c3d4ee;font-size:13px}.price-top span:first-child:before{content:"◉";color:var(--cyan);font-size:19px;margin-right:8px}.amount{font-size:34px;font-weight:800;letter-spacing:-1px;margin:10px 0 4px}.formula{color:var(--cyan);font-size:14px}.note{color:#adc0df;font-size:12px;line-height:1.55;margin:14px 0 0;max-width:95%}.cta{width:86%;margin:14px auto 4px;display:flex;align-items:center;justify-content:center;gap:10px;min-height:51px;border:1px solid #00eaff;border-radius:16px;background:linear-gradient(115deg,#00cfff,#0877ff 50%,#04cfff);box-shadow:0 0 18px #00baff6b,inset 0 0 12px #d5fcff5a;font-weight:800;font-size:16px}.cta:active,.quick button:active{transform:scale(.985)}
+    .bottom{position:fixed;z-index:5;bottom:calc(8px + var(--safe));left:50%;transform:translateX(-50%);width:min(92%,488px);height:60px;border:1px solid #16507a;border-radius:22px;background:#061326eF;backdrop-filter:blur(18px);display:grid;grid-template-columns:repeat(3,1fr);padding:4px;box-shadow:0 8px 28px #0009}.nav{border:0;background:transparent;color:#90a8cb;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px}.nav b{font-size:19px;font-weight:500}.nav.active{color:white;background:linear-gradient(120deg,#3422a2,#293ad1);box-shadow:inset 0 0 10px #727cff55}
+    .page-title{font-size:25px;margin:24px 4px 20px}.switcher{display:grid;grid-template-columns:1fr 1fr;border:1px solid #24466c;border-radius:17px;padding:4px;margin-bottom:17px}.switcher button{border:0;background:transparent;color:#a7bad8;border-radius:13px;height:44px;font-size:14px}.switcher button.active{background:linear-gradient(110deg,#00cfff,#0879ff);color:white;font-weight:700;box-shadow:0 0 12px #00aeff5a}.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.chip{white-space:nowrap;border:1px solid #274361;background:#0b1729;color:#9fb3d1;border-radius:18px;padding:9px 14px;font-size:12px}.chip.active{background:#2737c8;border-color:#387cff;color:#fff}.empty{text-align:center;color:#7186a7;margin:82px 0;font-size:15px}.txn{display:flex;align-items:center;gap:12px;padding:15px 4px;border-bottom:1px solid #203147}.txn-icon{width:38px;height:38px;border:1px solid #075c8c;color:var(--cyan);border-radius:50%;display:grid;place-items:center;font-size:20px}.txn small{display:block;color:#8299bb;margin-top:5px}.txn strong{margin-left:auto;color:var(--cyan);font-size:14px;white-space:nowrap}.txn.negative strong{color:#afc3e7}
+    .profile{border:1px solid #1c5681;border-radius:20px;padding:14px;background:linear-gradient(130deg,#07182b,#091b31);display:flex;align-items:center;gap:13px;margin:10px 0 20px}.avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#03365a,#071020);border:2px solid #00bfff;color:#00d9ff;font-size:24px}.profile strong{font-size:16px}.profile small{display:block;color:#9eb2d0;margin-top:5px}.profile .id{margin-left:auto;color:#96acd0;font-size:12px}.balance-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}.mini-balance{border:1px solid #17557b;background:#07182b;border-radius:14px;padding:12px;color:#a8bbd6;font-size:12px}.mini-balance strong{display:block;color:white;font-size:18px;margin-top:5px}.section-caption{font-size:11px;letter-spacing:3px;color:#8298b8;margin:24px 5px 9px}.setting-list{border:1px solid #17466d;border-radius:19px;overflow:hidden;background:linear-gradient(145deg,#09182a,#071424)}.setting{display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center;padding:13px 12px;border-bottom:1px solid #192d44;min-height:67px}.setting:last-child{border:0}.sicon{width:39px;height:39px;border-radius:12px;background:#0d2942;color:#13ceff;display:grid;place-items:center;font-size:18px}.setting strong{font-size:14px;font-weight:500}.setting small{display:block;color:#899fbe;font-size:11px;margin-top:4px}.arrow{color:#93a9c9;font-size:19px}.toggle{width:39px;height:23px;border-radius:20px;background:#324158;padding:3px;display:flex;justify-content:flex-start}.toggle i{height:17px;width:17px;background:white;border-radius:50%}.toggle.on{background:#087eff;justify-content:flex-end}
+    .overlay{position:fixed;inset:0;background:#020814c9;z-index:10;display:none;align-items:flex-end;justify-content:center}.overlay.open{display:flex}.sheet{width:min(100%,520px);padding:20px 18px calc(22px + var(--safe));border:1px solid #1f6a93;border-radius:24px 24px 0 0;background:linear-gradient(150deg,#0d2037,#06111f);box-shadow:0 -10px 32px #00152c}.sheet-head{display:flex;align-items:center;justify-content:space-between;font-size:19px;font-weight:700;margin-bottom:14px}.close{border:0;background:#14263e;color:#b8cce8;border-radius:50%;width:31px;height:31px;font-size:19px}.sheet p{color:#a6bddc;line-height:1.5;font-size:14px}.sheet input{width:100%;height:52px;background:#071525;border:1px solid #285176;border-radius:13px;padding:0 14px;outline:0;margin:8px 0}.sheet button.action{width:100%;height:49px;border:1px solid #00dfff;border-radius:14px;background:linear-gradient(110deg,#00cfff,#146eff);font-weight:700;margin-top:10px}.toast{position:fixed;z-index:20;left:50%;bottom:85px;transform:translate(-50%,10px);opacity:0;background:#122a43;border:1px solid #176995;border-radius:14px;padding:11px 16px;font-size:13px;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .intro{position:fixed;inset:0;z-index:30;background:#000;display:none;align-items:center;justify-content:center}.intro.show{display:flex}.intro video{width:100%;height:100%;object-fit:cover}.skip{position:absolute;right:18px;bottom:calc(28px + var(--safe));background:#07101d77;border:1px solid #6a7f9a55;border-radius:18px;color:#b9c5d7;font-size:11px;padding:7px 11px;opacity:.65;backdrop-filter:blur(6px)}body.reduce-motion *{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+    @media(min-width:520px){.app{padding-left:20px;padding-right:20px}.hero{height:205px}.mode{height:91px}}
+  </style>
 </head>
-
-<body data-mode="Напы">
-<main>
-  <header class="hero">
-    <svg class="hero-logo" viewBox="0 0 120 140" aria-label="Arslan Boost logo">
-      <defs>
-        <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
-          <stop stop-color="#27e7ff"/><stop offset="1" stop-color="#247cff"/>
-        </linearGradient>
-      </defs>
-      <path d="M60 8 69 19 85 17 89 31 105 39 98 53 110 66 97 78 100 92 83 96 78 111 60 106 42 111 37 96 20 92 23 78 10 66 22 53 15 39 31 31 35 17 51 19Z"
-            fill="#07101d" stroke="url(#neon)" stroke-width="3"/>
-      <path d="M29 67 20 56 31 54 25 43 40 46 47 32 56 26 60 38 69 27 78 37 89 39 84 51 98 54 91 63"
-            fill="none" stroke="url(#neon)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M42 65 53 61 49 68 40 69M67 61 78 65 80 69 71 68Z" fill="#10dcff"/>
-      <path d="M37 81Q60 91 83 81M37 91 20 108 29 119 50 108M83 91 100 108 91 119 70 108"
-            fill="none" stroke="url(#neon)" stroke-width="3" stroke-linecap="round"/>
-      <path d="M14 76 4 68 14 64M106 76 116 68 106 64" fill="none" stroke="#d9f7ff" stroke-width="3"/>
-    </svg>
-    <div>
-      <div class="brand">ARSLANBOOST</div>
-      <h1>STANDOFF 2</h1>
-      <div class="boost-word">RANK BOOST</div>
-      <div class="tagline">Rank oshirish xizmati</div>
-    </div>
-  </header>
-
-  <h2>Rejimni tanlang</h2>
-  <div class="modes">
-    <button class="mode active" type="button" data-mode="Напы">Напы</button>
-    <button class="mode" type="button" data-mode="Сорев">Сорев</button>
-    <button class="mode" type="button" data-mode="Дуэль">Дуэль</button>
-  </div>
-  <div class="selected-mode" id="selectedMode">Tanlangan rejim: Напы</div>
-
-  <label>Hozirgi rankingiz</label>
-  <button class="rank-select" id="currentButton" type="button">
-    <span class="rank-icon" id="currentIcon"></span>
-    <span class="rank-name" id="currentName"></span>
-    <span class="chevron">⌄</span>
-  </button>
-
-  <label>Maqsad rank</label>
-  <button class="rank-select" id="targetButton" type="button">
-    <span class="rank-icon" id="targetIcon"></span>
-    <span class="rank-name" id="targetName"></span>
-    <span class="chevron">⌄</span>
-  </button>
-
-  <label for="player">O‘yin ID yoki nick</label>
-  <input class="player" id="player" autocomplete="off" placeholder="Masalan: 12345678 yoki Player">
-
-  <section class="card">
-    <div class="row"><span>Buyurtma narxi</span><span id="steps">1 ta bosqich</span></div>
-    <div class="total" id="price">3 000 so‘m</div>
-    <div class="breakdown" id="breakdown"></div>
-    <div class="note">
-      Narx tanlangan ranklar bo‘yicha hisoblanadi. Buyurtma Telegram orqali
-      administratorga yuboriladi. To‘lovni administrator bilan kelishasiz.
-    </div>
-    <button class="order" id="order" type="button" disabled>Buyurtma berish</button>
-  </section>
-  <footer>ARSLAN BOOST · STANDOFF 2</footer>
-</main>
-
-<div class="picker" id="picker" hidden>
-  <div class="picker-box">
-    <div class="picker-head">
-      <strong>RANKNI TANLANG</strong>
-      <button class="close-picker" id="closePicker" type="button" aria-label="Yopish">×</button>
-    </div>
-    <div id="rankList"></div>
-  </div>
-</div>
-
-<script>
-const ranks=[
-  "Calibration","Bronze","Silver","Gold","Phoenix",
-  "Ranger","Champion","Master","Elite","The Legend"
-];
-
-// Narxlar o‘zgartirilmagan: keyingi rankka o‘tish narxi
-const prices=[3000,4000,6000,9000,13000,18000,25000,35000,50000];
-const colors=["#b87345","#c5d0df","#f4c747","#ff7657","#56baff",
-              "#75a8ff","#b495ff","#58dfff","#d9e5ef","#38d9ff"];
-
-let from=0,to=1,mode="Напы",pickerFor="current";
-const picker=document.querySelector("#picker");
-const rankList=document.querySelector("#rankList");
-
-function badge(i){
-  const c=colors[i];
-  const inner=i<3
-    ? `<path d="M25 33h30M28 39h24M32 45h16" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`
-    : `<path d="m40 27 3.5 7 7.7 1.1-5.6 5.4 1.3 7.6-6.9-3.6-6.9 3.6 1.3-7.6-5.6-5.4 7.7-1.1Z" fill="${c}"/>`;
-  return `<svg viewBox="0 0 80 74" width="42" height="46" aria-hidden="true">
-    <path d="M40 3 69 13v22c0 17-12 28-29 36C23 63 11 52 11 35V13Z"
-      fill="#0b1522" stroke="${c}" stroke-width="3"/>
-    <path d="M17 17 40 9l23 8v17c0 13-9 22-23 29-14-7-23-16-23-29Z"
-      fill="${c}" fill-opacity=".13" stroke="${c}" stroke-opacity=".55"/>
-    ${inner}
-    <path d="M26 53h28" stroke="${c}" stroke-width="2" opacity=".8"/>
-    <circle cx="40" cy="57" r="2.5" fill="${c}"/>
-  </svg>`;
-}
-
-function renderSelected(){
-  document.querySelector("#currentIcon").innerHTML=badge(from);
-  document.querySelector("#targetIcon").innerHTML=badge(to);
-  document.querySelector("#currentName").textContent=ranks[from];
-  document.querySelector("#targetName").textContent=ranks[to];
-}
-function openPicker(which){
-  pickerFor=which;
-  rankList.innerHTML="";
-  ranks.forEach((name,i)=>{
-    const b=document.createElement("button");
-    b.type="button";
-    b.className="rank-option"+(i===(which==="current"?from:to)?" current-choice":"");
-    b.innerHTML=`<span class="rank-icon">${badge(i)}</span><span>${name}</span>`;
-    b.addEventListener("click",()=>{
-      if(pickerFor==="current") from=i; else to=i;
-      renderSelected();
-      update();
-      picker.hidden=true;
-    });
-    rankList.appendChild(b);
-  });
-  picker.hidden=false;
-}
-document.querySelector("#currentButton").addEventListener("click",()=>openPicker("current"));
-document.querySelector("#targetButton").addEventListener("click",()=>openPicker("target"));
-document.querySelector("#closePicker").addEventListener("click",()=>picker.hidden=true);
-picker.addEventListener("click",e=>{if(e.target===picker)picker.hidden=true});
-
-function money(n){return new Intl.NumberFormat("ru-RU").format(n)+" so‘m"}
-function update(){
-  let sum=0,parts=[];
-  if(to>from){
-    for(let i=from;i<to;i++){sum+=prices[i];parts.push(money(prices[i]));}
-    document.querySelector("#steps").textContent=(to-from)+" ta bosqich";
-    document.querySelector("#breakdown").textContent=parts.join(" + ")+" = "+money(sum);
-  }else{
-    document.querySelector("#steps").textContent="Yuqoriroq rankni tanlang";
-    document.querySelector("#breakdown").textContent="";
-  }
-  document.querySelector("#price").textContent=money(sum);
-  document.querySelector("#order").disabled=to<=from||!document.querySelector("#player").value.trim();
-}
-document.querySelector("#player").addEventListener("input",update);
-
-document.querySelectorAll(".mode").forEach(button=>{
-  button.addEventListener("click",()=>{
-    document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
-    button.classList.add("active");
-    mode=button.dataset.mode;
-    document.body.dataset.mode=mode;
-    document.querySelector("#selectedMode").textContent="Tanlangan rejim: "+mode;
-  });
-});
-
-document.querySelector("#order").addEventListener("click",()=>{
-  const player=document.querySelector("#player").value.trim();
-  const text=
-    "Assalomu alaykum! Arslan Boost buyurtmasi.\n"+
-    "Rejim: "+mode+"\n"+
-    "O‘yin ID yoki nick: "+player+"\n"+
-    "Rank: "+ranks[from]+" → "+ranks[to]+"\n"+
-    "Narxi: "+document.querySelector("#price").textContent;
-  const url="https://t.me/theaxadov?text="+encodeURIComponent(text);
-  if(window.Telegram?.WebApp)Telegram.WebApp.openTelegramLink(url);
-  else window.location.href=url;
-});
-
-renderSelected();
-update();
-if(window.Telegram?.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}
-</script>
-</body>
-</html>
+<body>
+  <main class="app">
+    <div class="tg-head"><button class="tg-icon left" aria-label="Back">‹</button><div><strong>Arslan Boost</strong><span>мини‑приложение</span></div><button class="tg-icon right" aria-label="More">···</button></div>
+    <section class="page active" id="home">
+      <div class="hero" aria-label="Arslan Boost — Standoff 2 rank boost"></div>
+      <div class="quick">
+        <button data-sheet="balance"><span class="qicon">▤</span><span>Balans<strong id="quick-balance">0 so'm</strong></span><span class="plus">+</span></button>
+        <button data-sheet="promo"><span class="qicon">◇</span><span>Promo kod</span><span>›</span></button>
+        <button data-sheet="support"><span class="qicon">◉</span><span>Texnik yordam</span><span>›</span></button>
+      </div>
+      <h1>Rejimni tanlang</h1>
+      <div class="mode-grid">
+        <button class="mode selected" data-mode="wing">Напы</button><button class="mode" data-mode="comp">Сорев</button><button class="mode" data-mode="duel">Дуэль</button>
+      </div><div class="chosen" id="mode-label">Tanlangan rejim: Напы</div>
+      <div class="label">Hozirgi rankingiz</div><div class="field"><span class="rank-mark">♢</span><select id="from-rank"></select><span>⌃<br>⌄</span></div>
+      <div class="label">Maqsad rank</div><div class="field"><span class="rank-mark">⌑</span><select id="to-rank"></select><span>⌃<br>⌄</span></div>
+      <div class="label">O'yin ID yoki nick</div><div class="field"><input id="game-id" placeholder="Masalan: 12345678 yoki Player" autocomplete="off"></div>
+      <article class="price-card"><div class="price-top"><span>Buyurtma narxi</span><span id="steps">1 ta bosqich</span></div><div class="amount" id="amount">3 000 so'm</div><div class="formula" id="formula">3 000 so'm = 3 000 so'm</div><p class="note">Narx tanlangan ranklar bo‘yicha hisoblanadi. Buyurtma Telegram orqali administratorga yuboriladi. To‘lovni administrator bilan kelishing.</p></article>
+      <button class="cta" id="order-btn"><span>➤</span> Buyurtma berish</button>
+    </section>
+    <section class="page" id="history"><h1 class="page-title">Tarix</h1><div class="switcher"><button class="active" data-history="orders">Buyurtmalar</button><button data-history="payments">To‘lovlar</button></div><div class="filters" id="filters"><button class="chip active">Barchasi</button><button class="chip">Bajarildi</button><button class="chip">Kutilmoqda</button><button class="chip">Bekor qilingan</button></div><div id="history-content"><div class="empty">Tranzaksiyalar yo‘q</div></div></section>
+    <section class="page" id="settings"><div class="profile"><div class="avatar">A</div><div><strong id="username">Arslan Boost</strong><small id="telegram-id">Mini App foydalanuvchisi</small></div><span class="id">ID</span></div><div class="balance-row"><div class="mini-balance">BALANS<strong id="setting-balance">0 so'm</strong></div><div class="mini-balance">KESHBEK<strong style="color:#00d8ff">0</strong></div></div><h1 class="page-title">Sozlamalar</h1><div class="section-caption">TIL</div><div class="switcher"><button class="active" data-lang="uz">O‘zbekcha</button><button data-lang="ru">Русский</button></div><div class="section-caption">SOZLAMALAR</div><div class="setting-list">
+        <div class="setting" data-sheet="profile"><span class="sicon">♙</span><div><strong>Profil ma'lumotlari</strong><small>Profilingiz va shaxsiy ma'lumotlar</small></div><span class="arrow">›</span></div>
+        <div class="setting" data-nav="history"><span class="sicon" style="color:#8da5ff">◴</span><div><strong>Buyurtmalar tarixi</strong><small>Barcha buyurtmalar va ularning holati</small></div><span class="arrow">›</span></div>
+        <div class="setting" data-sheet="promo"><span class="sicon">◇</span><div><strong>Promo kodlar</strong><small>Promo kodni faollashtirish va bonuslar</small></div><span class="arrow">›</span></div>
+        <div class="setting" data-sheet="support"><span class="sicon" style="color:#159dff">◉</span><div><strong>Qo'llab-quvvatlash</strong><small>Savollar bo‘yicha 24/7 yordam</small></div><span class="arrow">›</span></div>
+        <div class="setting" id="motion-row"><span class="sicon" style="color:#e36dff">ϟ</span><div><strong>Animatsiyalar</strong><small>Ilova animatsiyalarini kamaytirish</small></div><span class="toggle" id="motion-toggle"><i></i></span></div>
+        <div class="setting" data-sheet="security"><span class="sicon" style="color:#41e2bb">♢</span><div><strong>Xavfsizlik</strong><small>Akkaunt parolini botga yubormang</small></div><span class="arrow">›</span></div>
+        <div class="setting" data-sheet="about"><span class="sicon" style="color:#67cfff">ⓘ</span><div><strong>Ilova haqida</strong><small>Arslan Boost · Standoff 2 rank boost</small></div><span class="arrow">›</span></div>
+      </div></section>
+  </main>
+  <nav class="bottom"><button class="nav active" data-page="home"><b>⌂</b>Bosh sahifa</button><button class="nav" data-page="history"><b>◴</b>Tarix</button><button class="nav" data-page="settings"><b>♙</b>Sozlamalar</button></nav>
+  <div class="overlay" id="overlay"><div class="sheet"><div class="sheet-head"><span id="sheet-title"></span><button class="close" id="close-sheet">×</button></div><div id="sheet-body"></div></div></div>
+  <div class="toast" id="toast"></div>
+  <div class="intro" id="intro"><video id="intro-video" muted playsinline preload="auto"><source src="assets/intro-neon-1s.mp4" type="video/mp4"></video><button class="skip" id="skip">O‘tkazish</button></div>
+  <script>
+  (()=>{
+    const tg=window.Telegram?.WebApp; try{tg?.ready();tg?.expand();tg?.setHeaderColor?.('#06101e');tg?.setBackgroundColor?.('#06101e')}catch{}
+    const ranks=['Calibration','Bronze','Silver','Gold','Fenix','Ranger','Champion','Master','Elita','The Legend'];
+    const prices=[0,3000,4000,6000,9000,13000,18000,25000,35000,50000];
+    const modeNames={wing:'Напы',comp:'Сорев',duel:'Дуэль'}; const state={mode:'wing',historyTab:'orders',balance:0};
+    const money=n=>new Intl.NumberFormat('ru-RU').format(n).replace(/\u00a0/g,' ');
+    const from=document.querySelector('#from-rank'),to=document.querySelector('#to-rank');
+    ranks.forEach((r,i)=>{from.add(new Option(r,i));to.add(new Option(r,i))}); from.value='0';to.value='1';
+    function updatePrice(){let a=+from.value,b=+to.value;if(b<=a){b=Math.min(a+1,ranks.length-1);to.value=b}let total=prices.slice(a+1,b+1).reduce((x,y)=>x+y,0);let count=b-a;document.querySelector('#amount').textContent=money(total)+" so'm";document.querySelector('#formula').textContent=`${money(total)} so'm = ${money(total)} so'm`;document.querySelector('#steps').textContent=`${count} ta bosqich`}
+    from.addEventListener('change',()=>{if(+to.value<=+from.value)to.value=Math.min(+from.value+1,ranks.length-1);updatePrice()});to.addEventListener('change',updatePrice);
+    document.querySelectorAll('.mode').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('selected',x===btn));state.mode=btn.dataset.mode;document.querySelector('#mode-label').textContent='Tanlangan rejim: '+modeNames[state.mode]}));
+    function nav(page){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===page));document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:document.body.classList.contains('reduce-motion')?'auto':'smooth'})}
+    document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));
+    function toast(text){let t=document.querySelector('#toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+    const overlay=document.querySelector('#overlay'),title=document.querySelector('#sheet-title'),body=document.querySelector('#sheet-body');
+    const sheets={balance:['Balansni to‘ldirish',`<p>Balansni to‘ldirish uchun administrator bilan bog‘laning. To‘lov rekvizitlarini faqat tasdiqlangan manbadan oling.</p><button class="action" data-contact>Administratorga yozish</button>`],promo:['Promo kod',`<p>Promo kodni kiriting — bonus yoki chegirma buyurtma narxiga qo‘llanadi.</p><input id="promo-input" placeholder="Promo kod"><button class="action" id="promo-submit">Faollashtirish</button>`],support:['Texnik yordam',`<p>Buyurtma, balans yoki to‘lov bo‘yicha yordam kerakmi? Administratorga yozing. Parol yoki SMS kod yubormang.</p><button class="action" data-contact>Qo‘llab-quvvatlashga yozish</button>`],profile:['Profil ma’lumotlari',`<p>Telegram profilingiz Mini App orqali avtomatik aniqlanadi.</p><div class="field">${tg?.initDataUnsafe?.user?.first_name||'Foydalanuvchi'}</div>`],security:['Xavfsizlik',`<p>Boost uchun o‘yin akkaunti parolini bu yerga kiritmang. Xavfsiz topshirish usulini administrator bilan kelishing.</p>`],about:['Ilova haqida',`<p>Arslan Boost — Standoff 2 rank oshirish xizmati.</p><p>Napы · Сорев · Дуэль</p>`]};
+    function openSheet(name){const item=sheets[name]||sheets.about;title.textContent=item[0];body.innerHTML=item[1];overlay.classList.add('open');body.querySelector('[data-contact]')?.addEventListener('click',()=>{const url=window.ARSLAN_CONFIG?.supportUrl;if(url)tg?.openTelegramLink?.(url);else toast('Support havolasini config.js ichida sozlang')});body.querySelector('#promo-submit')?.addEventListener('click',()=>{let v=body.querySelector('#promo-input').value.trim();toast(v?'Kod serverga yuborilishi uchun backend kerak':'Promo kodni kiriting');if(v)overlay.classList.remove('open')})}
+    document.querySelectorAll('[data-sheet]').forEach(x=>x.addEventListener('click',()=>openSheet(x.dataset.sheet)));document.querySelector('#close-sheet').addEventListener('click',()=>overlay.classList.remove('open'));overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
+    document.querySelector('#motion-row').addEventListener('click',()=>{let on=!document.body.classList.contains('reduce-motion');document.body.classList.toggle('reduce-motion',on);document.querySelector('#motion-toggle').classList.toggle('on',on);localStorage.setItem('ab-reduced-motion',String(on))});if(localStorage.getItem('ab-reduced-motion')==='true'){document.body.classList.add('reduce-motion');document.querySelector('#motion-toggle').classList.add('on')}
+    document.querySelectorAll('[data-lang]').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b===x));toast(x.dataset.lang==='uz'?'Til: O‘zbekcha':'Rus tili tarjimasi ulanadi')}));
+    document.querySelectorAll('[data-history]').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('[data-history]').forEach(b=>b.classList.toggle('active',b===x));state.historyTab=x.dataset.history;document.querySelector('#filters').style.display=state.historyTab==='orders'?'flex':'none';document.querySelector('#history-content').innerHTML='<div class="empty">Tranzaksiyalar yo‘q</div>'}));
+    document.querySelectorAll('#filters .chip').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('#filters .chip').forEach(x=>x.classList.toggle('active',x===c))}));
+    const user=tg?.initDataUnsafe?.user;if(user){document.querySelector('#username').textContent=[user.first_name,user.last_name].filter(Boolean).join(' ')||'Foydalanuvchi';document.querySelector('#telegram-id').textContent=user.username?'@'+user.username:'Telegram profili'}
+    document.querySelector('#order-btn').addEventListener('click',()=>{const id=document.querySelector('#game-id').value.trim();if(!id){document.querySelector('#game-id').focus();toast('O‘yin ID yoki nickni kiriting');return}let total=+document.querySelector('#amount').textContent.replace(/[^0-9]/g,'');let order={type:'boost_order',mode:state.mode,from:ranks[+from.value],to:ranks[+to.value],gameId:id,amount:total};if(window.ARSLAN_CONFIG?.orderBotUrl){tg?.openTelegramLink?.(window.ARSLAN_CONFIG.orderBotUrl);toast('Buyurtma tafsilotlarini botga yuboring')}else if(tg?.sendData){tg.sendData(JSON.stringify(order));tg?.HapticFeedback?.notificationOccurred?.('success')}else{tg?.HapticFeedback?.notificationOccurred?.('success');openSheet('about');title.textContent='Buyurtma tayyor';body.innerHTML=`<p>🎮 ${modeNames[order.mode]}<br>🏅 ${order.from} → ${order.to}<br>🆔 ${order.gameId}<br>💰 ${money(order.amount)} so‘m</p><p>Telegram ichida ochilganda buyurtma ma’lumoti botga uzatiladi. Web previewda bu tasdiqlash oynasi ko‘rinadi.</p><button class="action" id="confirm-order">Tushunarli</button>`;body.querySelector('#confirm-order').onclick=()=>overlay.classList.remove('open')}});
+    updatePrice();
+    const intro=document.querySelector('#intro'),video=document.querySelector('#intro-video');function finishIntro(){intro.classList.remove('show');try{video.pause();video.currentTime=0}catch{}}document.querySelector('#skip').addEventListener('click',finishIntro);video.addEventListener('ended',finishIntro);if(!localStorage.getItem('ab-intro-seen')&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){localStorage.setItem('ab-intro-seen','1');intro.classList.add('show');video.play().catch(finishIntro)}
+  })();
+  </script>
+</body></html>
