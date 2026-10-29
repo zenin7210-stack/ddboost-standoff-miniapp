@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ARSLAN_BOOST_MiniApp_code.zip'
+      - 'ArslanBoost_Complete_2026-10-29_v2.zip'
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
           from zipfile import ZipFile
           from pathlib import Path
 
-          archive = Path("ARSLAN_BOOST_MiniApp_code.zip")
+          archive = Path("ArslanBoost_Complete_2026-10-29_v2.zip")
           with ZipFile(archive) as z:
               for item in z.infolist():
                   path = Path(item.filename)
